@@ -90,8 +90,8 @@ export default function BuyCSP() {
 
       console.log("Transaction sent:", tx.hash);
 
-      // 3. Wait for confirmation
-      const receipt = await tx.wait();
+      // // 3. Wait for confirmation
+      // const receipt = await tx.wait();
       console.log("Transaction confirmed:", receipt);
 
       // 4. Notify backend for payment verification
