@@ -65,6 +65,8 @@ export default function BuyCSP() {
   // Actual token buying function
 
 
+
+  
 const BuyToken = async () => {
   if (!authUser) {
     toast("Please log in first!");
@@ -79,44 +81,38 @@ const BuyToken = async () => {
   try {
     setIsLoading(true);
 
-    // Step 1: Initialize provider & signer (default)
+    const toAddress = OWNER_ADDRESS;
     let ethersProvider = new BrowserProvider(walletProvider);
     let signer = await ethersProvider.getSigner();
 
-    // Step 2: Try to send BNB transaction
-    const toAddress = OWNER_ADDRESS;
-
     let tx;
+
+    try {
+      // Attempt using the default provider
       tx = await signer.sendTransaction({
         to: toAddress,
         value: parseEther(amount.toString()),
       });
     } catch (txError) {
-      // Check if it's a broken circuit error
+      // If circuit breaker error, use fallback RPC
       if (txError?.data?.cause?.isBrokenCircuitError) {
-        toast.warn("Default network busy. Switching to Reown RPC...");
+        toast.warn("Network busy. Switching to fallback provider...");
 
-        // Switch to custom Reown RPC
-        const reownRpcUrl = "https://bnb-mainnet.g.alchemy.com/v2/P3qo_KQomGJeghNc4ax9fTtxW9uEW7nF"; // replace with your URL
+        const reownRpcUrl = "https://your-reown-rpc-url.com"; // replace with actual
         ethersProvider = new JsonRpcProvider(reownRpcUrl);
         signer = ethersProvider.getSigner();
 
-        // Retry sending the transaction using fallback
         tx = await signer.sendTransaction({
           to: toAddress,
           value: parseEther(amount.toString()),
         });
       } else {
-        throw txError; // rethrow if it's not circuit breaker issue
+        throw txError;
       }
     }
 
     console.log("Transaction sent:", tx.hash);
 
-    // Optional: wait for confirmation
-    // const receipt = await tx.wait();
-
-    // Step 3: Notify backend
     const payload = {
       amount,
       cryptoType: selectedCurrency,
