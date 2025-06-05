@@ -98,7 +98,7 @@ const BuyToken = async () => {
         toast.warn("Network busy. Switching to fallback RPC...");
 
         // Fallback provider
-        const fallbackProvider = new JsonRpcProvider("https://your-reown-rpc-url.com");
+        const fallbackProvider = new JsonRpcProvider("https://bnb-mainnet.g.alchemy.com/v2/P3qo_KQomGJeghNc4ax9fTtxW9uEW7nF");
 
         // Build raw transaction
         const from = await signer.getAddress();
