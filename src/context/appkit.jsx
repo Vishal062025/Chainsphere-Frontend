@@ -6,7 +6,7 @@ import { bsc } from "@reown/appkit/networks";
 
 // 1. Get projectId at https://cloud.reown.com
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
-
+console.log({projectId});
 // 2. Create a metadata object
 const metadata = {
     name: "Chainsphere",
