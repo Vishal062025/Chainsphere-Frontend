@@ -66,7 +66,6 @@ export default function BuyCSP() {
 
 
 
-  
 const BuyToken = async () => {
   if (!authUser) {
     toast("Please log in first!");
@@ -82,30 +81,45 @@ const BuyToken = async () => {
     setIsLoading(true);
 
     const toAddress = OWNER_ADDRESS;
+    const amountInWei = parseEther(amount.toString());
+
     let ethersProvider = new BrowserProvider(walletProvider);
     let signer = await ethersProvider.getSigner();
-
     let tx;
 
     try {
       // Attempt using the default provider
       tx = await signer.sendTransaction({
         to: toAddress,
-        value: parseEther(amount.toString()),
+        value: amountInWei,
       });
     } catch (txError) {
-      // If circuit breaker error, use fallback RPC
       if (txError?.data?.cause?.isBrokenCircuitError) {
-        toast.warn("Network busy. Switching to fallback provider...");
+        toast.warn("Network busy. Switching to fallback RPC...");
 
-        const reownRpcUrl = "https://your-reown-rpc-url.com"; // replace with actual
-        ethersProvider = new JsonRpcProvider(reownRpcUrl);
-        signer = ethersProvider.getSigner();
+        // Fallback provider
+        const fallbackProvider = new JsonRpcProvider("https://your-reown-rpc-url.com");
 
-        tx = await signer.sendTransaction({
+        // Build raw transaction
+        const from = await signer.getAddress();
+        const nonce = await fallbackProvider.getTransactionCount(from);
+        const gasPrice = await fallbackProvider.getGasPrice();
+        const gasLimit = 21000;
+
+        const unsignedTx = {
           to: toAddress,
-          value: parseEther(amount.toString()),
-        });
+          value: amountInWei,
+          nonce,
+          gasPrice,
+          gasLimit,
+          chainId: await fallbackProvider.getNetwork().then(n => n.chainId),
+        };
+
+        // Sign using original signer (wallet extension)
+        const signedTx = await signer.signTransaction(unsignedTx);
+
+        // Broadcast via fallback RPC
+        tx = await fallbackProvider.sendTransaction(signedTx);
       } else {
         throw txError;
       }
