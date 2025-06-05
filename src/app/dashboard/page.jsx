@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { BrowserProvider, Contract, ethers, formatUnits, parseEther } from "ethers";
+import { BrowserProvider, Contract, ethers, formatUnits, JsonRpcProvider, parseEther } from "ethers";
 import { useState, useEffect } from "react";
 import ICO_CONTRACT_ABI from "@/contract/ico.json";
 import { ICO_CONTRACT_ADDRESS, CSP_PRICE , OWNER_ADDRESS} from "../../env/config";
@@ -64,65 +64,95 @@ export default function BuyCSP() {
 
   // Actual token buying function
 
-  const BuyToken = async () => {
-    if (!authUser) {
-      toast("Please log in first!");
-      return;
-    }
 
-    try {
-      if (!isConnected){
-          toast("Please connect wallet first");
-      return;
-      }
-      setIsLoading(true);
+const BuyToken = async () => {
+  if (!authUser) {
+    toast("Please log in first!");
+    return;
+  }
 
-      // 1. Create Ethers.js provider & signer from Reown SDK
-      const ethersProvider = new BrowserProvider(walletProvider); // From Reown
-      const signer = await ethersProvider.getSigner();
+  if (!isConnected) {
+    toast("Please connect wallet first");
+    return;
+  }
 
-      // 2. Send BNB to the target address
-      const toAddress = OWNER_ADDRESS;
-      const tx = await signer.sendTransaction({
+  try {
+    setIsLoading(true);
+
+    // Step 1: Initialize provider & signer (default)
+    let ethersProvider = new BrowserProvider(walletProvider);
+    let signer = await ethersProvider.getSigner();
+
+    // Step 2: Try to send BNB transaction
+    const toAddress = OWNER_ADDRESS;
+
+    let tx;
+      tx = await signer.sendTransaction({
         to: toAddress,
-        value: parseEther(amount.toString()), // amount should be in BNB (string or number)
+        value: parseEther(amount.toString()),
       });
+    } catch (txError) {
+      // Check if it's a broken circuit error
+      if (txError?.data?.cause?.isBrokenCircuitError) {
+        toast.warn("Default network busy. Switching to Reown RPC...");
 
-      console.log("Transaction sent:", tx.hash);
+        // Switch to custom Reown RPC
+        const reownRpcUrl = "https://bnb-mainnet.g.alchemy.com/v2/P3qo_KQomGJeghNc4ax9fTtxW9uEW7nF"; // replace with your URL
+        ethersProvider = new JsonRpcProvider(reownRpcUrl);
+        signer = ethersProvider.getSigner();
 
-      // // 3. Wait for confirmation
-      // const receipt = await tx.wait();
-      console.log("Transaction confirmed:", receipt);
-
-      // 4. Notify backend for payment verification
-      const payload = {
-        amount,
-        cryptoType: selectedCurrency,
-        transactionHash: tx.hash,
-      };
-
-      const response = await axios.post(
-        `${BASE_URL}/api/payment/create-payment`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Make sure token is defined
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log("Payment API response:", response.data);
-
-      await fetchTransactions(); // Refresh user's transaction list
-      toast.success("BNB sent successfully!");
-    } catch (error) {
-      console.error("Error sending BNB:", error);
-      toast.error("BNB transaction failed");
-    } finally {
-      setIsLoading(false);
+        // Retry sending the transaction using fallback
+        tx = await signer.sendTransaction({
+          to: toAddress,
+          value: parseEther(amount.toString()),
+        });
+      } else {
+        throw txError; // rethrow if it's not circuit breaker issue
+      }
     }
-  };
+
+    console.log("Transaction sent:", tx.hash);
+
+    // Optional: wait for confirmation
+    // const receipt = await tx.wait();
+
+    // Step 3: Notify backend
+    const payload = {
+      amount,
+      cryptoType: selectedCurrency,
+      transactionHash: tx.hash,
+    };
+
+    const response = await axios.post(
+      `${BASE_URL}/api/payment/create-payment`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Payment API response:", response.data);
+    await fetchTransactions();
+    toast.success("BNB sent successfully!");
+  } catch (error) {
+    console.error("Error sending BNB:", error);
+
+    if (error?.code === "ACTION_REJECTED") {
+      toast.error("Transaction rejected by user.");
+    } else if (error?.code === "INSUFFICIENT_FUNDS") {
+      toast.error("Insufficient BNB balance.");
+    } else if (error?.message?.includes("user denied transaction")) {
+      toast.error("You cancelled the transaction.");
+    } else {
+      toast.error("BNB transaction failed. Please try again.");
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   
 // Get total locked amount for user
