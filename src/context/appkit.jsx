@@ -9,10 +9,10 @@ const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 
 // 2. Create a metadata object
 const metadata = {
-    name: "My Website",
-    description: "My Website description",
-    url: "https://mywebsite.com", // origin must match your domain & subdomain
-    icons: ["https://avatars.mywebsite.com/"],
+    name: "Chainsphere",
+    description: "The world is on the brink of an artificial intelligence revolution, and Chainsphere is at the forefront. Our vision is to create a decentralized, AI-powered ecosystem that transforms industries, enhances efficiency, and drives automation across multiple sectors.",
+    url: "https://chainsphere.tech", // origin must match your domain & subdomain
+    icons: ["https://chainsphere.tech/images/logo.svg"],
 };
 
 // 3. Create the AppKit instance
