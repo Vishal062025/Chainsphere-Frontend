@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { BrowserProvider, Contract, ethers, formatUnits, parseEther } from "ethers";
+import { BrowserProvider, Contract, ethers,JsonRpcProvider, formatUnits, parseEther } from "ethers";
 import { useState, useEffect } from "react";
 import ICO_CONTRACT_ABI from "@/contract/ico.json";
 import { ICO_CONTRACT_ADDRESS, CSP_PRICE , OWNER_ADDRESS} from "../../env/config";
