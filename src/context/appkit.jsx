@@ -30,7 +30,6 @@ export function AppKit({children}) {
     return (
         <>
             {children}
-            
         </>
     );
 }

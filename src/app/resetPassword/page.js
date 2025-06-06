@@ -1,13 +1,18 @@
 "use client";
 import { ResetPasswordForm } from "@/components/resetPasswordForm";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
  
 export default function LoginPage() {
   const router = useRouter();
-  let requested = localStorage.getItem("requestforChangePassword");
-  if(!requested){
-    router.push("/login")
-  }
+
+  useEffect(() => {
+    const requested = localStorage.getItem("requestforChangePassword");
+    if (!requested) {
+      router.push("/login");
+    }
+  }, [router]);
+  
   return (
     <div
       className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">

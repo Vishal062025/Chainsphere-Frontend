@@ -12,6 +12,8 @@ import { BiShow } from "react-icons/bi";
 import { BiHide } from "react-icons/bi";
 import { userAuth } from "@/Use_Context/authContext";
 import { BASE_URL } from "@/config/config";
+
+
 export function ResetPasswordForm() {
   const router = useRouter();
   const { authUser, userDetails } = userAuth();
@@ -28,7 +30,7 @@ export function ResetPasswordForm() {
     confirmPassword: "",
   });
 
-  const token = authUser;
+  // const token = authUser;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

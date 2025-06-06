@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { AuthContextProvider } from "@/Use_Context/authContext";
 import Footer from "@/components/Footer";
 import {AppKit} from "@/context/appkit";
+import { WalletProvider } from "@/walletContext/WalletContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <AuthContextProvider>
-      {/* <WalletProvider> */}
+      <WalletProvider>
         <html lang="en">
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -41,7 +42,7 @@ export default function RootLayout({ children }) {
             <Footer />
           </body>
         </html>
-      {/* </WalletProvider> */}
+      </WalletProvider>
 
 
     </AuthContextProvider>
