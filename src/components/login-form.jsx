@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner"
@@ -21,7 +21,9 @@ export function LoginForm({ className, ...props }) {
   const router = useRouter();
 
   // temp validation if user is already login
-  if(localStorage.getItem("token")) router.push("/dashboard")
+  useEffect(() => {
+    if (localStorage.getItem("token")) router.push("/dashboard")
+  }, [router]);
 
   const [formData, setFormData] = useState({
     email: "",

@@ -3,7 +3,8 @@
 import { React, useEffect, useState } from "react";
 import PaymentModal from "@/components/PaymentModal";
 import axios from "axios";
-import { useWallet } from "@/context/WalletContext";  //added
+import { useWallet } from "@/walletContext/WalletContext";
+// import { useWallet } from "@/context/WalletContext";  //added
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState([]);
@@ -12,7 +13,8 @@ export default function TransactionsPage() {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("");
-    const { sendTransaction, account } = useWallet();  //added
+  // const { sendTransaction, account } = useWallet();  //added
+  const { account } = useWallet();
 
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function TransactionsPage() {
 
     try {
       // Send transaction using wallet context
-      await sendTransaction({ to: recipient, valueInEth });
+      // await sendTransaction({ to: recipient, valueInEth });
 
       // Optionally record transaction on your backend
       const token = localStorage.getItem("token");
