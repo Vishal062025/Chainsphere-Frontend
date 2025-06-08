@@ -6,10 +6,12 @@ import Demodata2 from "./Demodata2";
 import PresaleCard from "./PresaleCard";
 import Usecases from "./Usecases";
 import Tokenomics from "./Tokenomics";
+
 function Landing() {
   return (
     <div section="landing">
       <div
+        id="home"
         section="sec-1"
         className="home-container md:h-screen max-w-6xl mx-auto flex items-center justify-center gap-5"
       >

@@ -1,8 +1,9 @@
+import Image from 'next/image';
 import React from 'react';
 
 export default function ChainsphereTopicsPage() {
     return (
-        <div className=" text-white min-h-screen px-2 md:px-16 pb-10">
+        <div id='topics' className=" text-white min-h-screen px-2 md:px-16 pb-10 scroll-mt-20">
             <h1 className="text-5xl font-bold mb-4 text-center">Topics</h1>
             <p className="text-yellow-400 text-xl font-semibold text-center mb-2">
                 Explore a World of Knowledge
@@ -23,10 +24,10 @@ export default function ChainsphereTopicsPage() {
                     </p>
                 </div>
                 <div className="flex items-center justify-center">
-                    <img src="/images/topic1.svg" alt="Blockchain Globe" className="w-3/4 drop-shadow-lg" />
+                    <Image width={388} height={388} src="/images/topic1.svg" alt="Blockchain Globe" className="w-3/4 drop-shadow-lg" />
                 </div>
                 <div className="flex items-center justify-center">
-                    <img src="/images/topic2.svg" alt="Blockchain Technology" className="w-3/4 drop-shadow-lg" />
+                    <Image width={388} height={388} src="/images/topic2.svg" alt="Blockchain Technology" className="w-3/4 drop-shadow-lg" />
                 </div>
                 <div className="flex flex-col justify-center ">
                     <h2 className="text-yellow-400 text-2xl font-semibold mb-4">
