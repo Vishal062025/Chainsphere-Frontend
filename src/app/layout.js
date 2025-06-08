@@ -43,8 +43,6 @@ export default function RootLayout({ children }) {
           </body>
         </html>
       </WalletProvider>
-
-
     </AuthContextProvider>
   );
 }

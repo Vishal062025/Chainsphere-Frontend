@@ -2,7 +2,7 @@ import React from 'react'
 
 function Usecases() {
   return (
-    <div className='pt-16 px-2'>
+    <div id='technology' className='pt-16 px-2'>
         <h1 className='text-[28px] md:text-[50px] font-medium mx-auto text-center my-10 leading-tight'>Technologies & Usecases</h1>
         <div className='relative flex flex-col max-w-5xl mx-auto justify-center space-y-10'> 
         <img src="/images/1.svg" alt="Usecases" />

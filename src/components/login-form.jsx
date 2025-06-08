@@ -16,7 +16,7 @@ import { BASE_URL } from "@/config/config";
 
 export function LoginForm({ className, ...props }) {
 
-  const { login } = userAuth();
+  const { login, checkAuth } = userAuth();
 
   const router = useRouter();
 
@@ -54,6 +54,9 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
+   useEffect(()=>{
+      checkAuth()
+    })
   return (
       <div className={cn("flex  flex-col gap-6", className)} {...props}>
         <Card className="overflow-hidden  p-0">

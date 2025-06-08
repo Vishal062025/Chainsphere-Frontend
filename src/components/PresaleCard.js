@@ -1,9 +1,41 @@
-import { userAuth } from "@/Use_Context/authContext";
+import { BASE_URL } from "@/config/config";
+import axios from "axios";
 import Link from "next/link";
-import React from "react";
+import React, {useEffect, useState} from "react";
 
 function PresaleCard() {
-  const { authUser } = userAuth();
+const [tokenData, setTokenData] = useState({
+  totalTokens: "000,000",
+  totalPayoutUSD: "0,000,000",
+  percentage: ""
+})
+
+ useEffect(() => {
+    const fetchTokenData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/token/`);
+        console.log({data: response?.data?.data});
+        setTokenData({...response?.data?.data, percentage: (Number(response?.data?.data?.totalTokens) * 100  / 531000000) + "%"});
+      } catch (error) {
+        console.error("Error fetching token data:", error);
+           setTokenData({
+    totalTokens: "000,000",
+    totalPayoutUSD: "0,000,000",
+    percentage: "0%"
+  } )
+      }
+    };
+
+    // Fetch immediately
+    fetchTokenData();
+
+    // Poll every 10 seconds
+    const interval = setInterval(fetchTokenData, 10000);
+
+    // Clear interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+console.log({tokenData});
 
   return (
     <div>
@@ -21,7 +53,7 @@ function PresaleCard() {
 
             <div className="text-center mb-4">
               <p className="font-geometria font-extrabold text-3xl mb-1 max-tablet:text-2xl max-smallTablet:text-xl">
-                <span>$000,000</span> / <span className="text-[#943535]">$250,000</span>
+                <span>${tokenData.totalPayoutUSD}</span> / <span className="text-[#943535]">$250,000</span>
               </p>
               <p className="font-geometria text-lg max-smallTablet:text-base">Buy in before price increases!</p>
             </div>
@@ -32,7 +64,7 @@ function PresaleCard() {
                   Token Sold
                 </h3>
                 <p className="font-geometria font-semibold text-base text-left max-smallTablet:text-xs">
-                  0,000,000 CSP
+                  {tokenData.totalTokens} CSP
                 </p>
               </div>
               <div>
@@ -55,13 +87,13 @@ function PresaleCard() {
                   height="40"
                   decoding="async"
                   className="absolute top-[-10px] select-none translate-x-[-25%]"
-                  style={{ color: "transparent", left: "0%" }}
+                  style={{ color: "transparent", left: tokenData.percentage }}
                   src="/images/progressIcon.png"
                 />
                 <p className="h-[20px] max-tablet:h-5 bg-[#080A12] rounded-full overflow-hidden">
                   <span
                     className="block h-full rounded-full bg-gradient-to-r from-[#5271FF] to-[#00FFBB] transition-all duration-150 ease-out"
-                    style={{ width: "0%" }}
+                    style={{ width: tokenData.percentage }}
                   ></span>
                 </p>
                 <p className="font-geometria mt-2.5 text-base max-smallTablet:text-xs font-medium flex justify-between">
@@ -105,14 +137,14 @@ function PresaleCard() {
 
             <div className="flex md:flex-row flex-col items-center justify-center max-tablet:flex-col gap-3">
 
-              <Link className="cursor-pointer" href={`${userAuth ? "/buy_csp" : "/register"}`}>
+              <Link className="cursor-pointer" href="/login">
                 <button
                   className="font-geometria select-none font-bold text-center text-xl border-transparent outline-none focus-visible:border-white/10 border-2 flex justify-center h-[60px] items-center w-[255px] text-white rounded-[50px] py-[16px] px-[50px] bg-[#3859FF] cursor-pointer transition-all duration-[0.5s] ease-in hover:text-[#343C67] hover:bg-[#07FEB8] active:bg-[#85FFDC] active:transition-none"
                 >
                   Buy
                 </button>
               </Link>
-              <Link className="cursor-pointer" href="/buy_csp">
+              <Link className="cursor-pointer" href="/login">
                 <button className="font-geometria font-bold text-xl w-[255px] h-[60px] bg-[#FFFFFF] flex flex-row gap-4 items-center px-[35px] py-4 rounded-[50px] justify-center transition-all duration-[0.5s] ease-in hover:bg-[#07FEB8] active:bg-[#85FFDC]">
                   <span className="text-[#1C2449] text-[18px]">Connect wallet</span>
                   <img alt="Wallet" loading="lazy" width="30" height="30" src="/images/walletIcon.svg" />

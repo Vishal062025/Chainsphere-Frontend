@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { BrowserProvider, Contract, ethers,JsonRpcProvider, formatUnits, parseEther } from "ethers";
 import { useState, useEffect } from "react";
 import ICO_CONTRACT_ABI from "@/contract/ico.json";
-import { ICO_CONTRACT_ADDRESS, CSP_PRICE , OWNER_ADDRESS} from "../../env/config";
+import ERC20_ABI from "@/contract/usdt.json";
+import { ICO_CONTRACT_ADDRESS, CSP_PRICE , OWNER_ADDRESS, USDT_CONTRACT_ADDRESS} from "../../env/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LayoutWrapper from "@/components/LayoutWrapper";
@@ -17,7 +18,7 @@ import { BASE_URL } from "@/config/config";
 import { LucideStretchHorizontal } from "lucide-react";
 
 export default function BuyCSP() {
-  const { authUser, userDetails } = userAuth();
+  const { authUser, checkAuth } = userAuth();
   // const { account, isBuyCSPDisabled } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
     const [isTokenLoading, setIsTokenLoading] = useState(false);
@@ -40,6 +41,7 @@ export default function BuyCSP() {
       console.log({ binanceprice: res.data.binancecoin.usd });
       setBnbPrice(res.data.binancecoin.usd);
     }
+
     initialize();
   }, []);
 
@@ -66,62 +68,123 @@ export default function BuyCSP() {
 
 
   
-const BuyToken = async () => {
-  if (!authUser) {
-    toast("Please log in first!");
-    return;
-  }
 
-  if (!isConnected) {
-    toast("Please connect wallet first");
-    return;
-  }
+  
+
+  const BuyToken = async () => {
+  if (!authUser) return toast("Please log in first!");
+  if (!isConnected) return toast("Please connect wallet first");
+
+  setIsLoading(true);
 
   try {
-    setIsLoading(true);
-
+    const token = localStorage.getItem("token");
     const toAddress = OWNER_ADDRESS;
     const amountInWei = parseEther(amount.toString());
 
-    let ethersProvider = new BrowserProvider(walletProvider);
-    let signer = await ethersProvider.getSigner();
+    const ethersProvider = new BrowserProvider(walletProvider);
+    const signer = await ethersProvider.getSigner();
+    const from = await signer.getAddress();
+
     let tx;
 
-    try {
-      // Attempt using the default provider
-      tx = await signer.sendTransaction({
-        to: toAddress,
-        value: amountInWei,
-      });
-    } catch (txError) {
-      if (txError?.data?.cause?.isBrokenCircuitError) {
-        toast.warn("Network busy. Switching to fallback RPC...");
+    if (selectedCurrency === "BNB") {
+      try {
+        tx = await signer.sendTransaction({ to: toAddress, value: amountInWei });
+      } catch (txError) {
+        if (txError?.data?.cause?.isBrokenCircuitError) {
+          toast.warn("Network busy. Using fallback RPC...");
 
-        // Fallback provider
-        const fallbackProvider = new JsonRpcProvider("https://bnb-mainnet.g.alchemy.com/v2/P3qo_KQomGJeghNc4ax9fTtxW9uEW7nF");
+          const fallbackProvider = new JsonRpcProvider("https://bnb-mainnet.g.alchemy.com/v2/YOUR_KEY");
+          const nonce = await fallbackProvider.getTransactionCount(from);
+          const gasPrice = await fallbackProvider.getGasPrice();
 
-        // Build raw transaction
-        const from = await signer.getAddress();
-        const nonce = await fallbackProvider.getTransactionCount(from);
-        const gasPrice = await fallbackProvider.getGasPrice();
-        const gasLimit = 21000;
+          const unsignedTx = {
+            to: toAddress,
+            value: amountInWei,
+            nonce,
+            gasPrice,
+            gasLimit: 21000,
+            chainId: await fallbackProvider.getNetwork().then(n => n.chainId),
+          };
 
-        const unsignedTx = {
-          to: toAddress,
-          value: amountInWei,
-          nonce,
-          gasPrice,
-          gasLimit,
-          chainId: await fallbackProvider.getNetwork().then(n => n.chainId),
-        };
+          const signedTx = await signer.signTransaction(unsignedTx);
+          tx = await fallbackProvider.sendTransaction(signedTx);
+        } else {
+          throw txError;
+        }
+      }
+    } else if (selectedCurrency === "USDT") {
+      const usdtContract = new Contract(USDT_CONTRACT_ADDRESS, ERC20_ABI, signer);
+      const fallbackProvider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
+      const fallbackSigner = fallbackProvider.getSigner(from);
+      const fallbackUsdtContract = new Contract(USDT_CONTRACT_ADDRESS, ERC20_ABI, fallbackSigner);
 
-        // Sign using original signer (wallet extension)
-        const signedTx = await signer.signTransaction(unsignedTx);
+      try {
+          try {
+            const approvalTx = await usdtContract.approve(toAddress, amountInWei);
+            const receipt = await approvalTx.wait();
+            if (!receipt.status) throw new Error("Approval transaction failed.");
+          } catch (approvalError) {
+            if (approvalError?.data?.cause?.isBrokenCircuitError) {
+              toast.warn("Approval failed, using fallback RPC...");
 
-        // Broadcast via fallback RPC
-        tx = await fallbackProvider.sendTransaction(signedTx);
-      } else {
-        throw txError;
+              const nonce = await fallbackProvider.getTransactionCount(from);
+              const gasPrice = await fallbackProvider.getGasPrice();
+
+              const approvalData = fallbackUsdtContract.interface.encodeFunctionData("approve", [toAddress, amountInWei]);
+
+              const txRequest = {
+                to: USDT_CONTRACT_ADDRESS,
+                data: approvalData,
+                nonce,
+                gasPrice,
+                gasLimit: 100000,
+                chainId: await fallbackProvider.getNetwork().then(n => n.chainId),
+              };
+
+              const signedTx = await signer.signTransaction(txRequest);
+               await fallbackProvider.sendTransaction(signedTx);
+            } else if (approvalError?.code === "ACTION_REJECTED") {
+              return toast.error("Approval rejected by user.");
+            } else {
+              console.error("Approval failed:", approvalError);
+              return toast.error("USDT approval failed.");
+            }
+          }
+
+        try {
+          tx = await usdtContract.transfer(toAddress, amountInWei);
+        } catch (transferError) {
+          if (transferError?.data?.cause?.isBrokenCircuitError) {
+            toast.warn("Transfer failed, using fallback RPC...");
+
+            const nonce = await fallbackProvider.getTransactionCount(from);
+            const gasPrice = await fallbackProvider.getGasPrice();
+
+            const transferData = fallbackUsdtContract.interface.encodeFunctionData("transfer", [toAddress, amountInWei]);
+
+            const txRequest = {
+              to: USDT_CONTRACT_ADDRESS,
+              data: transferData,
+              nonce,
+              gasPrice,
+              gasLimit: 100000,
+              chainId: await fallbackProvider.getNetwork().then(n => n.chainId),
+            };
+
+            const signedTx = await signer.signTransaction(txRequest);
+            tx = await fallbackProvider.sendTransaction(signedTx);
+          } else if (transferError?.code === "ACTION_REJECTED") {
+            return toast.error("Transfer rejected by user.");
+          } else {
+            console.error("Transfer error:", transferError);
+            return toast.error("USDT transfer failed.");
+          }
+        }
+      } catch (usdtError) {
+        console.error("USDT error:", usdtError);
+        return toast.error("USDT transaction failed.");
       }
     }
 
@@ -146,24 +209,24 @@ const BuyToken = async () => {
 
     console.log("Payment API response:", response.data);
     await fetchTransactions();
-    toast.success("BNB sent successfully!");
+
+    toast.success(`${selectedCurrency} sent successfully!`);
   } catch (error) {
-    console.error("Error sending BNB:", error);
+    console.error(`Error sending ${selectedCurrency}:`, error);
 
     if (error?.code === "ACTION_REJECTED") {
       toast.error("Transaction rejected by user.");
     } else if (error?.code === "INSUFFICIENT_FUNDS") {
-      toast.error("Insufficient BNB balance.");
+      toast.error("Insufficient balance.");
     } else if (error?.message?.includes("user denied transaction")) {
       toast.error("You cancelled the transaction.");
     } else {
-      toast.error("BNB transaction failed. Please try again.");
+      toast.error(`${selectedCurrency} transaction failed. Please try again.`);
     }
   } finally {
     setIsLoading(false);
   }
 };
-
 
   
 // Get total locked amount for user
@@ -180,7 +243,7 @@ const getTotalLockedAmount = async () => {
     const icoContract = new Contract(ICO_CONTRACT_ADDRESS, ICO_CONTRACT_ABI, signer);
 
     const lockInfoArray = await icoContract.getUserLocks(address);
-console.log({lockInfoArray});
+// console.log({lockInfoArray});
     if (!lockInfoArray || lockInfoArray.length === 0) {
         setIsTokenLoading(false)
       return "0";
@@ -233,6 +296,10 @@ console.log({lockInfoArray});
     }
   }, [authUser, isConnected, address]);
 
+  useEffect(()=>{
+    checkAuth()
+  })
+
   return (
     <LayoutWrapper>
       <div className="relative z-30 ">
@@ -259,6 +326,7 @@ console.log({lockInfoArray});
               className="bg-white text-black border outline-none font-semibold border-gray-300 px-4 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
             >
               <option value="BNB">BNB</option>
+              <option value="USDT">USDT</option>
             </select>
           </div>
 
