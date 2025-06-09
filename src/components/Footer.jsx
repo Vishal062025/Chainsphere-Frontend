@@ -36,8 +36,18 @@ export default function Footer() {
                     <div>
                         <h3 className="text-white font-semibold mb-4">Quick Links</h3>
                         <ul className="space-y-3">
-                            <li><a href="/" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
-                            <li><a href="/" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                            <li>
+                                <a
+                                    href="/assets/docs/NebulaStrideWhitepaper.pdf"
+                                    target="_blank"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                    rel="noopener noreferrer"
+                                >
+                                    Whitepaper
+                                </a>
+                            </li>
+                            <li><a href='#features' className="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                            <li><a href='#home' className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
                             <li><a href="/" className="text-gray-400 hover:text-white transition-colors">Testimonials</a></li>
                             <li><a href="/" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
                         </ul>

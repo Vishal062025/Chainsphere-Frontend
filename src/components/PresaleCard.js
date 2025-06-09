@@ -39,7 +39,7 @@ console.log({tokenData});
 
   return (
     <div>
-      <div id="presale-form" className=" overflow-x-hidden flex max-w-5xl md:my-16 justify-center mx-auto flex-col items-center">
+      <div id="presale-form" className=" overflow-x-hidden flex max-w-5xl md:my-16 justify-center xl:mx-auto mx-4 flex-col items-center">
         <div className="mb-[50px]">
           <p className="font-krona font-normal text-sm text-center mb-4 leading-[17.5px] tracking-[0.6rem]"></p>
           <h2 className="font-krona text-[28px] md:text-[76px] max-tablet:text-[55px] max-smallTablet:text-[34px] max-mobile:text-[25px] leading-[95px] tracking-[-10%] text-center">
