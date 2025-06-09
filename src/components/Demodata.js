@@ -12,7 +12,7 @@ export default function FutureBuilding() {
   ];
 
   return (
-    <div id='features' className="text-white flex justify-center my-10 md:my-36 px-2 md:px-6 scroll-mt-20">
+    <div id='features' className="text-white flex justify-center my-10 md:my-36 mx-4 scroll-mt-20">
       <div className="text-center">
         <h2 className="text-white font-bold text-[28px] md:text-[60px] leading-tight">
           The Future We&apos;re Building

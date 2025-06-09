@@ -1,28 +1,26 @@
 "use client"
-import React from "react";
+import React, {useState} from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { userAuth } from "@/Use_Context/authContext";
-import { useRouter } from "next/navigation";
-import { navItem } from "@/lib/constant";
-import { useScrollSpy } from "@/hooks/useScrollSpy";
+import { usePathname, useRouter } from "next/navigation";
+import NavMenu from "@/components/NavMenu";
+import { Menu } from "lucide-react";
 
 function Navbar() {
+
+  const [showNavMenu, setShowNavMenu] = useState();
   const { authUser, logout } = userAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  function handleNavMenu() {
+    setShowNavMenu(prevState => !prevState);
+  }
   // let user = {};
   // if (authUser) {
   //   user = typeof userDetails === 'string' ? JSON.parse(userDetails) : userDetails;
   // }
-
-  const sectionIds = navItem.map(item => item.id);
-  const activeSectionId = useScrollSpy(sectionIds);
-
-  function handleNavItemClick(id) {
-    if (!id) return;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); 
-  }
 
   return (
     <nav className="fixed bg-black top-0 left-0 w-full flex justify-between z-150 shadow-md">
@@ -38,23 +36,18 @@ function Navbar() {
         </span>
       </div>
 
-      <ul className="flex gap-11 items-center">
-        {navItem.map((item, idx) => (
-          <li
-            key={idx}
-          >
-            <a
-              className={`font-semibold cursor-pointer transition-colors duration-100 ease-in-out 
-                        ${item.id === activeSectionId ? 'text-[#9b4bff]' : 'hover:text-[#9b4bff]'}`}
-              onClick={() => handleNavItemClick(item.id)}
-            >
-              {item.title}
-            </a>
-          </li>
-        ))}
-      </ul>
+      {pathname === '/' &&
+        <NavMenu
+          showNavMenu={showNavMenu}
+          setShowNavMenu={setShowNavMenu}
+        />} 
 
-      <div className="right p-4 flex gap-1 sm:gap-5">
+      <div className="right p-4 flex gap-1 sm:gap-5 items-center">
+        {pathname === '/' &&
+          <Menu
+            className="lg:hidden block"
+            onClick={handleNavMenu}
+          />}
         {!authUser ? (
           <>
             <Link className="cursor-pointer" href="/login">
