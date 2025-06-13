@@ -12,6 +12,7 @@ import { BiShow } from "react-icons/bi";
 import { BiHide } from "react-icons/bi";
 import { userAuth } from "@/Use_Context/authContext";
 import Link from "next/link";
+import Image from "next/image";
 import { BASE_URL } from "@/config/config";
 
 export function LoginForm({ className, ...props }) {
@@ -21,8 +22,12 @@ export function LoginForm({ className, ...props }) {
   const router = useRouter();
 
   // temp validation if user is already login
+  // useEffect(() => {
+  //   if (localStorage.getItem("token")) router.push("/dashboard")
+  // }, [router]);
+  
   useEffect(() => {
-    if (localStorage.getItem("token")) router.push("/dashboard")
+    checkAuth()
   }, [router]);
 
   const [formData, setFormData] = useState({
@@ -41,10 +46,7 @@ export function LoginForm({ className, ...props }) {
         formData
       );
       const token = response.data.data.token;
-      console.log(token);
-      // const user = response.data.data.user;
       localStorage.setItem("token", token);
-      // localStorage.setItem("user", JSON.stringify(user));
       toast("Login Successfully");
       login(token, response.data.data);
       router.push("/dashboard");
@@ -54,9 +56,6 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
-   useEffect(()=>{
-      checkAuth()
-    })
   return (
       <div className={cn("flex  flex-col gap-6", className)} {...props}>
         <Card className="overflow-hidden  p-0">
@@ -135,7 +134,10 @@ export function LoginForm({ className, ...props }) {
               </div>
             </form>
             <div className="bg-muted relative hidden md:block">
-              <img
+            <Image
+              width={358}
+              height={358}
+              loading="lazy"
                 src="/images/logo.svg"
                 alt="Image"
                 className="absolute inset-0 h-full w-full object-contain p-8 "

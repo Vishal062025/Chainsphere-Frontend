@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { userAuth } from "@/Use_Context/authContext";
 import axios from "axios"; // Import axios for API calls
 import { useState } from "react"; // Import useState for managing modal state
-import { BASE_URL, BASE_URL1 } from "../config/config";
+import { BASE_URL } from "../config/config";
 import { FaArrowRight } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
   { name: "Buy CSP", path: "/dashboard" },
@@ -22,42 +23,43 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
   // const { account, connectWallet } = useWallet();
   const { authUser } = userAuth();
 
   const [showSideBar, setShowSideBar] = useState(false);
 
-  const [modalOpen, setModalOpen] = useState(false); // State to manage modal visibility
-  const [referralCode, setReferralCode] = useState(""); // State to store referral code
-  const [copied, setCopied] = useState(false); // State to manage copy status
+  // const [modalOpen, setModalOpen] = useState(false);
+  const [referralCode, setReferralCode] = useState("XYZ"); //Testing With XYZ, Change it Later
+  const [copied, setCopied] = useState(false);
 
-  // Function to handle referral API call
   const handleReferClick = async () => {
-    if (!authUser) {
-      // Check if authUser is present
-      alert("Please log in first."); // Alert user to log in
-      return; // Exit the function if not logged in
-    }
+    // if (!authUser) {
+    //   alert("Please log in first.");
+    //   return;
+    // }
 
-    const token = authUser; // Get the auth token from authUser
+    // const token = authUser;
     try {
-      const response = await axios.get(`${BASE_URL}/user/referral-code`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the auth token
-        },
-      });
-      console.log("Referral Code Response:", response.data.data.referralCode); // Log the response
-      setReferralCode(response.data.data.referralCode); // Set the referral code
-      setModalOpen(true); // Open the modal
+      // const response = await axios.get(`${BASE_URL}/user/referral-code`, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`
+      //   },
+      // });
+
+      // setReferralCode(response.data.data.referralCode);
+      // setModalOpen(true);
+      router.push(`/referral?code=${referralCode}`);
     } catch (error) {
-      console.error("Error fetching referral code:", error); // Log any errors
+      console.error("Error fetching referral code:", error);
     }
   };
 
   // Function to copy referral code to clipboard
   const copyToClipboard = () => {
     navigator.clipboard
-      .writeText(BASE_URL1 + "registerReferral/" + referralCode)
+      .writeText(BASE_URL + "registerReferral/" + referralCode)
       .then(() => {
         // alert("Referral code copied to clipboard!"); // Notify user
         setCopied(true); // Set copied status to true
@@ -136,7 +138,7 @@ export default function Sidebar() {
       </ul>
 
       {/* Modal for displaying referral code */}
-      {modalOpen && (
+      {/* {modalOpen && (
         <div className="fixed z-50 inset-0 flex items-center justify-center bg-grey-600 bg-opacity-50 backdrop-blur-lg">
           <div className="bg-white max-w-sm  sm:max-w-full text-black p-5 rounded-lg shadow-lg">
             <h2 className="text-lg font-bold">Here is your referral link:</h2>
@@ -148,19 +150,18 @@ export default function Sidebar() {
                 copied ? "text-green-500 transform scale-105" : ""
               }`}
               onClick={copyToClipboard}
-              onMouseEnter={() => setCopied(false)} // Reset copied status on hover
+              onMouseEnter={() => setCopied(false)}
             >
-              {BASE_URL1 + "registerReferral/" + referralCode}{" "}
-              {/* Display the referral link */}
+              {BASE_URL + "registerReferral/" + referralCode}{" "}
             </p>
             {copied && <span className="text-green-500">Copied!</span>}{" "}
-            {/* Show copied message */}
             <Button className="mt-4" onClick={() => setModalOpen(false)}>
               Close
             </Button>
           </div>
         </div>
-      )}
+      )} */}
+      
     </div>
   );
 }

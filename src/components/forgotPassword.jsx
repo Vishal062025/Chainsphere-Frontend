@@ -9,6 +9,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { BASE_URL } from "@/config/config";
+import Image from "next/image";
 
 export function ForgotPassword() {
   const router = useRouter();
@@ -68,7 +69,10 @@ export function ForgotPassword() {
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img
+            <Image
+              width={100}
+              height={100}
+              loading="lazy"
               src="/images/logo.svg"
               alt="Image"
               className="absolute inset-0 h-full w-full object-contain p-8 "

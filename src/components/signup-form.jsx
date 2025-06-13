@@ -30,21 +30,12 @@ export function SignupForm({ className, ...props }) {
     if (data.password !== data.confirmPassword) {
           toast("Password and confirm password must be same");
     }
-    console.log(data);
+    console.log({data});
     try {
 
-      const res = await axios.post(`${BASE_URL}/api/auth/signup`, data);
-
-      // console.log("Signup success:", res.data)
-
-
-
-
+      await axios.post(`${BASE_URL}/api/auth/signup`, data);
       toast("Signup successful, please login with credentials!");
-      // localStorage.setItem("token", res?.data?.token)
-
       router.push("/login")
-
     } catch (err) {
 
       console.error("Signup error: ", err);
@@ -97,7 +88,7 @@ export function SignupForm({ className, ...props }) {
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="dob">Date of Birth</Label>
-                  <Input id="dob" name="dob" type="text" placeholder="15-06-1998" required />
+                  <Input id="dob" name="dob" type="text" placeholder="MM-DD-YYYY" required />
                 </div>
               </div>
 

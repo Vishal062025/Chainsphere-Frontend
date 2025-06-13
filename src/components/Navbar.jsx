@@ -6,6 +6,7 @@ import { userAuth } from "@/Use_Context/authContext";
 import { usePathname, useRouter } from "next/navigation";
 import NavMenu from "@/components/NavMenu";
 import { Menu } from "lucide-react";
+import Image from "next/image";
 
 function Navbar() {
 
@@ -25,7 +26,10 @@ function Navbar() {
   return (
     <nav className="fixed bg-black top-0 left-0 w-full flex justify-between z-150 shadow-md">
       <div className="left flex justify-start p-2 items-center max-w-fit">
-        <img
+        <Image
+          width={48}
+          height={48}
+          loading="lazy"
           src="/images/logo.svg"
           alt="logo"
           className="cursor-pointer w-12 p-2"
