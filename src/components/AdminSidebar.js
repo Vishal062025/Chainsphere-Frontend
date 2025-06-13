@@ -7,7 +7,7 @@ import { useWallet } from "../walletContext/WalletContext"; // Import the useWal
 import { userAuth } from "@/Use_Context/authContext";
 import axios from "axios"; // Import axios for API calls
 import { useState } from "react"; // Import useState for managing modal state
-import { BASE_URL, BASE_URL1 } from "../config/config";
+import { BASE_URL } from "../config/config";
 import { FaArrowRight } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa";
 

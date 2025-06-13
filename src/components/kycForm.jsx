@@ -8,6 +8,7 @@ import { useState } from "react";
 import { PiImagesFill } from "react-icons/pi";
 import axios from "axios";
 import { BASE_URL } from "@/config/config";
+import Image from "next/image";
 
 export function KycForm() {
   const [kycData, setKycData] = useState({
@@ -84,7 +85,10 @@ export function KycForm() {
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img
+            <Image
+              width={100}
+              height={100}
+              loading="lazy"
               src="/images/logo.svg"
               alt="Image"
               className="absolute inset-0 h-full w-full object-contain p-8 "

@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import Navbar from "@/components/Navbar";
 import { AuthContextProvider } from "@/Use_Context/authContext";
 import Footer from "@/components/Footer";
-import {AppKit} from "@/context/appkit";
+import { AppKit } from "@/context/appkit";
 import { WalletProvider } from "@/walletContext/WalletContext";
 
 const geistSans = Geist({
@@ -33,9 +33,9 @@ export default function RootLayout({ children }) {
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
-           <AppKit>
-             <Navbar />
-            {children}
+            <AppKit>
+              <Navbar />
+              {children}
             </AppKit>
             {/* <main className="mt-16">{children}</main> */}
             <Toaster />

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useState, useEffect } from "react";
 import abi from "@/contract/ico.json";
 import abi1 from "@/contract/usdt.json";
-import { ICO_CONTRACT_ADDRESS } from "../../env/config";
+import { CSP_PRICE, ICO_CONTRACT_ADDRESS } from "../../env/config";
 import { USDT_CONTRACT_ADDRESS } from "../../env/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import LayoutWrapper from '@/components/LayoutWrapper';
 import axios from "axios";
 // import { useWallet } from '../../walletContext/WalletContext'; // Import the useWallet hook
 import { userAuth } from "@/Use_Context/authContext";
+import Image from "next/image";
 
 export default function BuyCSP() {
   const { authUser, userDetails } = userAuth();
@@ -175,7 +176,7 @@ export default function BuyCSP() {
     <LayoutWrapper>
       {/* // background image start   */}
       <div className="bgImage fixed z-20 top-[73%] translate-y-[-50%] left-[55%] translate-x-[-50%]">
-        <img src="/images/logo.svg" alt="" className="logo opacity-50 blursm z-20 size-[300px]" />
+        <Image loading="lazy" width={300} height={300} src="/images/logo.svg" alt="Logo" className="logo opacity-50 blursm z-20 size-[300px]" />
       </div>
       {/* // background image ends    */}
       <div className="relative z-30 ">
@@ -187,7 +188,7 @@ export default function BuyCSP() {
           <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit  p-2 rounded-lg text-black">
             {selectedCurrency === "USDT"
               ? `1 CSP = ${cspPrice}`
-              : `1 CSP = ${((1 / bnbPrice) * 0.05).toFixed(8)} BNB`}
+              : `1 CSP = ${((1 / bnbPrice) * CSP_PRICE).toFixed(8)} BNB`}
           </div>
         </div>
 

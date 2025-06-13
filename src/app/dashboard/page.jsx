@@ -12,10 +12,8 @@ import axios from "axios";
 // import { useWallet } from '../../walletContext/WalletContext';
 import { userAuth } from "@/Use_Context/authContext";
 import { toast } from "sonner";
-import PaymentModal from "@/components/PaymentModal";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { BASE_URL } from "@/config/config";
-import { LucideStretchHorizontal } from "lucide-react";
 
 export default function BuyCSP() {
   const { authUser, checkAuth } = userAuth();
@@ -33,6 +31,7 @@ export default function BuyCSP() {
   const [transactions, setTransactions] = useState([]);
   const { address, caipAddress, isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
+
   useEffect(() => {
     async function initialize() {
       const res = await axios.get(
@@ -298,154 +297,152 @@ const getTotalLockedAmount = async () => {
 
   useEffect(()=>{
     checkAuth()
-  })
+  }, [])
 
   return (
     <LayoutWrapper>
-      <div className="relative z-30 ">
-        <div className="buy-csp-container relative z-30 flex flex-wrap gap-2 mb-10 items-center justify-between">
-          <h1 className="text-3xl font-bold">Buy CSP</h1>
-          <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit p-2 rounded-lg text-black">
-            {isTokenLoading ? "Loading..." : `Total CSP Tokens : ${totalLockedAmount}` }
-          </div>
-           <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit p-2 rounded-lg text-black">
-            {selectedCurrency === "USDT"
-              ? `1 CSP = ${CSP_PRICE}`
-              : `1 CSP = ${((1 / bnbPrice) * CSP_PRICE).toFixed(8)} BNB`}
-          </div>
+        <div className="relative z-30 ">
+          <div className="buy-csp-container relative z-30 flex flex-wrap gap-2 mb-10 items-center justify-between">
+            <h1 className="text-3xl font-bold">Buy CSP</h1>
+            <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit p-2 rounded-lg text-black">
+              {isTokenLoading ? "Loading..." : `Total CSP Tokens : ${totalLockedAmount}`}
+            </div>
+            <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit p-2 rounded-lg text-black">
+              {selectedCurrency === "USDT"
+                ? `1 CSP = ${CSP_PRICE}`
+                : `1 CSP = ${((1 / bnbPrice) * CSP_PRICE).toFixed(8)} BNB`}
+            </div>
           
-        </div>
+          </div>
 
-        <div className="flex flex-row flex-wrap gap-4 sm:gap-0 items-center justify-between bg-[#ffbe192b] backdrop-blur-lg p-4 rounded-lg mt-4">
-          <div className="flex flex-col space-y-2 mr-2">
-            <Label htmlFor="currency">Currency</Label>
-            <select
-              id="currency"
-              value={selectedCurrency}
-              onChange={handleCurrencyChange}
-              className="bg-white text-black border outline-none font-semibold border-gray-300 px-4 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
+          <div className="flex flex-row flex-wrap gap-4 sm:gap-0 items-center justify-between bg-[#ffbe192b] backdrop-blur-lg p-4 rounded-lg mt-4">
+            <div className="flex flex-col space-y-2 mr-2">
+              <Label htmlFor="currency">Currency</Label>
+              <select
+                id="currency"
+                value={selectedCurrency}
+                onChange={handleCurrencyChange}
+                className="bg-white text-black border outline-none font-semibold border-gray-300 px-4 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
+              >
+                <option value="BNB">BNB</option>
+                <option value="USDT">USDT</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col space-y-2 mx-2">
+              <Label htmlFor="amount">Amount</Label>
+              <Input
+                id="amount"
+                type="number"
+                min="0"
+                className="bg-gray-300"
+                placeholder="Enter amount"
+                value={amount}
+                onChange={handleAmountChange}
+              />
+            </div>
+
+            <div className="flex flex-col space-y-2 ml-2">
+              <Label htmlFor="estimatedCSP">Est CSP Tokens</Label>
+              <Input
+                id="estimatedCSP"
+                type="text"
+                value={`${estimatedCSP}`}
+                readOnly
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center mt-5">
+            <Button
+              className="hover:text-white hover:brightness-90 cursor-pointer"
+              onClick={BuyToken}
+              disabled={isLoading}
             >
-              <option value="BNB">BNB</option>
-              <option value="USDT">USDT</option>
-            </select>
+              {/* disabled={!account || isBuyCSPDisabled || !authUser} */}
+              {isLoading ? "Loading..." : "Buy and Stake"}
+            </Button>
           </div>
 
-          <div className="flex flex-col space-y-2 mx-2">
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              type="number"
-              min="0"
-              className="bg-gray-300"
-              placeholder="Enter amount"
-              value={amount}
-              onChange={handleAmountChange}
-            />
+          {/* Disclaimer Text below the button */}
+          {selectedCurrency === "BNB" && (
+            <p className="mt-2 text-sm text-white text-center">
+              **The <span className="text-yellow-400">BNB</span> price is
+              volatile, the live price will be considered.**
+            </p>
+          )}
+
+          {/* Trasaction history */}
+
+          <div className="mt-10 overflow-x-auto">
+            <h2 className="mb-4 font-semibold text-3xl">Transaction History</h2>
+            <table className="min-w-full table-auto border-collapse border border-gray-200 text-center">
+              <thead className="border border-gray-300 bg-[#ffbe192b] rounded-lg">
+                <tr>
+                  <th className="border border-gray-300 p-2">Transaction Hash</th>
+                  <th className="border border-gray-300 p-2">Amount</th>
+                  <th className="border border-gray-300 p-2">Crypto Type</th>
+                  <th className="border border-gray-300 p-2">CSP Tokens</th>
+                  <th className="border border-gray-300 p-2">CSP Price</th>
+                  <th className="border border-gray-300 p-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-2">No transactions found.</td>
+                  </tr>
+                ) : (
+                  transactions.map((transaction) => {
+                    const status = transaction.isActive
+                      ? "Pending"
+                      : transaction.isCompleted
+                        ? "Completed"
+                        : "Cancelled";
+
+                    const statusColor =
+                      status === "Completed"
+                        ? "text-green-600"
+                        : status === "Pending"
+                          ? "text-yellow-600"
+                          : "text-red-600";
+
+                    const hash = transaction.transactionHash;
+                    const shortHash = `${hash.slice(0, 6)}...${hash.slice(-4)}`;
+                    const scanLink = `https://bscscan.com/tx/${hash}`;
+
+                    return (
+                      <tr key={transaction.id} className="border border-gray-300">
+                        <td className="border border-gray-300 p-2">
+                          <a
+                            href={scanLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            {shortHash}
+                          </a>
+                        </td>
+                        <td className="border border-gray-300 p-2">{transaction.amount}</td>
+                        <td className="border border-gray-300 p-2">{transaction.cryptoType}</td>
+                        <td className="border border-gray-300 p-2">
+                          {transaction.token?.token ?? "-"}
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          {transaction.token?.currentPrice ?? "-"}
+                        </td>
+                        <td className={`border border-gray-300 p-2 font-semibold ${statusColor}`}>
+                          {status}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
 
-          <div className="flex flex-col space-y-2 ml-2">
-            <Label htmlFor="estimatedCSP">Est CSP Tokens</Label>
-            <Input
-              id="estimatedCSP"
-              type="text"
-              value={`${estimatedCSP}`}
-              readOnly
-            />
-          </div>
         </div>
-
-        <div className="flex justify-center mt-5">
-          <Button
-            className="hover:text-white hover:brightness-90 cursor-pointer"
-            onClick={BuyToken}
-            disabled={isLoading}
-          >
-            {/* disabled={!account || isBuyCSPDisabled || !authUser} */}
-            {isLoading ? "Loading..." : "Buy and Stake"}
-          </Button>
-        </div>
-
-        {/* Disclaimer Text below the button */}
-        {selectedCurrency === "BNB" && (
-          <p className="mt-2 text-sm text-white text-center">
-            **The <span className="text-yellow-400">BNB</span> price is
-            volatile, the live price will be considered.**
-          </p>
-        )}
-
-        {/* Trasaction history */}
-
-   <div className="mt-10 overflow-x-auto">
-  <h2 className="mb-4 font-semibold text-3xl">Transaction History</h2>
-  <table className="min-w-full table-auto border-collapse border border-gray-200 text-center">
-    <thead className="border border-gray-300 bg-[#ffbe192b] rounded-lg">
-      <tr>
-        <th className="border border-gray-300 p-2">Transaction Hash</th>
-        <th className="border border-gray-300 p-2">Amount</th>
-        <th className="border border-gray-300 p-2">Crypto Type</th>
-        <th className="border border-gray-300 p-2">CSP Tokens</th>
-        <th className="border border-gray-300 p-2">CSP Price</th>
-        <th className="border border-gray-300 p-2">Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {transactions.length === 0 ? (
-        <tr>
-          <td colSpan={6} className="p-2">No transactions found.</td>
-        </tr>
-      ) : (
-        transactions.map((transaction) => {
-          const status = transaction.isActive
-            ? "Pending"
-            : transaction.isCompleted
-            ? "Completed"
-            : "Cancelled";
-
-          const statusColor =
-            status === "Completed"
-              ? "text-green-600"
-              : status === "Pending"
-              ? "text-yellow-600"
-              : "text-red-600";
-
-          const hash = transaction.transactionHash;
-          const shortHash = `${hash.slice(0, 6)}...${hash.slice(-4)}`;
-          const scanLink = `https://bscscan.com/tx/${hash}`;
-
-          return (
-            <tr key={transaction.id} className="border border-gray-300">
-              <td className="border border-gray-300 p-2">
-                <a
-                  href={scanLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  {shortHash}
-                </a>
-              </td>
-              <td className="border border-gray-300 p-2">{transaction.amount}</td>
-              <td className="border border-gray-300 p-2">{transaction.cryptoType}</td>
-              <td className="border border-gray-300 p-2">
-                {transaction.token?.token ?? "-"}
-              </td>
-              <td className="border border-gray-300 p-2">
-                {transaction.token?.currentPrice ?? "-"}
-              </td>
-              <td className={`border border-gray-300 p-2 font-semibold ${statusColor}`}>
-                {status}
-              </td>
-            </tr>
-          );
-        })
-      )}
-    </tbody>
-  </table>
-</div>
-
-      </div>
-
-      {/* Payment Modal Component */}
     </LayoutWrapper>
   );
 }
