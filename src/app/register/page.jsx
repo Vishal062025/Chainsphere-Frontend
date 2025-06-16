@@ -10,7 +10,7 @@ export default function SignupFormWrapper() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-4 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">
-        <SignupForm referal={referralCode} />
+        <SignupForm referralCode={referralCode} />
       </div>
     </div>
   );
