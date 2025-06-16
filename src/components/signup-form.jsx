@@ -6,19 +6,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner"
 import { BASE_URL } from "@/config/config";
 
-export function SignupForm({ className, ...props }) {
+export function SignupForm({referal, className, ...props }) {
   const [loading, setLoading] = useState(false);
 
   // const navigate =useNavigate();
   const router = useRouter();
-
-  const searchParams = useSearchParams();
-  const referal = searchParams.get("referralCode");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
