@@ -50,7 +50,7 @@ export default function Sidebar() {
 
       // setReferralCode(response.data.data.referralCode);
       // setModalOpen(true);
-      router.push(`/referral?code=${referralCode}`);
+      router.push(`/referral`);
     } catch (error) {
       console.error("Error fetching referral code:", error);
     }
