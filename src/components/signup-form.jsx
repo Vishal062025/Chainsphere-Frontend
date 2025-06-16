@@ -11,38 +11,43 @@ import axios from "axios";
 import { toast } from "sonner"
 import { BASE_URL } from "@/config/config";
 
-export function SignupForm({referal, className, ...props }) {
+export function SignupForm({referralCode, className, ...props }) {
   const [loading, setLoading] = useState(false);
 
   // const navigate =useNavigate();
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    const formData = new FormData(e.target);
+  const formData = new FormData(e.target);
+  const rawData = Object.fromEntries(formData.entries());
 
-    const data = Object.fromEntries(formData.entries());
+  if (rawData.password !== rawData.confirmPassword) {
+    toast("Password and confirm password must be the same");
+    setLoading(false);
+    return;
+  }
 
-    if (data.password !== data.confirmPassword) {
-          toast("Password and confirm password must be same");
-    }
-    console.log({data});
-    try {
-
-      await axios.post(`${BASE_URL}/api/auth/signup`, data);
-      toast("Signup successful, please login with credentials!");
-      router.push("/login")
-    } catch (err) {
-
-      console.error("Signup error: ", err);
-      toast(err.response.data.error);
-
-    } finally {
-      setLoading(false);
-    }
+  const data = {
+    ...rawData,
+    ...(referralCode && { referal: referralCode }), // Use 'referral' or 'referal' as per your backend
   };
+
+  console.log({ data });
+
+  try {
+    await axios.post(`${BASE_URL}/api/auth/signup`, data);
+    toast("Signup successful, please login with credentials!");
+    router.push("/login");
+  } catch (err) {
+    console.error("Signup error: ", err);
+    toast(err?.response?.data?.error || "Signup failed.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -113,7 +118,7 @@ export function SignupForm({referal, className, ...props }) {
 
               <div className="grid gap-3">
                 <Label htmlFor="referal">Referal</Label>
-                <Input id="referal" name="referal" disabled={referal ?? false} type="text" placeholder="If you have a referal code" value={referal} />
+                <Input id="referal" name="referal" disabled={referralCode ?? false} type="text" placeholder="If you have a referal code" value={referralCode} />
               </div>
 
               <div className="grid gap-3">
