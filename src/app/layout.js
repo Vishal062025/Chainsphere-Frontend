@@ -6,6 +6,7 @@ import { AuthContextProvider } from "@/Use_Context/authContext";
 import Footer from "@/components/Footer";
 import { AppKit } from "@/context/appkit";
 import { WalletProvider } from "@/walletContext/WalletContext";
+import { Suspense } from "react"; // ✅ import Suspense
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +22,7 @@ export const metadata = {
   title: "Chainsphere",
   description: "ICO for Chainsphere",
   icons: {
-    icon: "/favicon.svg", // or '/your-custom-logo.svg'
+    icon: "/favicon.svg",
   },
 };
 
@@ -35,9 +36,11 @@ export default function RootLayout({ children }) {
           >
             <AppKit>
               <Navbar />
-              {children}
+              {/* ✅ Wrap children in Suspense */}
+              <Suspense fallback={<div>Loading page...</div>}>
+                {children}
+              </Suspense>
             </AppKit>
-            {/* <main className="mt-16">{children}</main> */}
             <Toaster />
             <Footer />
           </body>
