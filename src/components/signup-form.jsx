@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner"
 import { BASE_URL } from "@/config/config";
@@ -17,7 +17,8 @@ export function SignupForm({ className, ...props }) {
   // const navigate =useNavigate();
   const router = useRouter();
 
-  const referal = useParams();
+  const searchParams = useSearchParams();
+  const referal = searchParams.get("referralCode");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,7 +116,7 @@ export function SignupForm({ className, ...props }) {
 
               <div className="grid gap-3">
                 <Label htmlFor="referal">Referal</Label>
-                <Input id="referal" name="referal" type="text" placeholder="If you have a referal code" value={referal.referralCode} />
+                <Input id="referal" name="referal" disabled={referal ?? false} type="text" placeholder="If you have a referal code" value={referal} />
               </div>
 
               <div className="grid gap-3">
