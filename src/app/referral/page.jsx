@@ -37,7 +37,7 @@ const ReferralHomePage = () => {
       console.log({error})
     }
   }
-  const url = "https://intelisync.ai/xyz"
+
  
   useEffect(()=>{
     checkAuth()
