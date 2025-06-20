@@ -2,7 +2,7 @@
 
 import { createAppKit } from "@reown/appkit/react";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
-import { bsc } from "@reown/appkit/networks";
+import { bsc, bscTestnet } from "@reown/appkit/networks";
 
 // 1. Get projectId at https://cloud.reown.com
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
@@ -19,7 +19,7 @@ const metadata = {
 createAppKit({
     adapters: [new EthersAdapter()],
     metadata,
-    networks: [bsc],
+    networks: [bscTestnet],
     projectId,
     features: {
         analytics: true, // Optional - defaults to your Cloud configuration
