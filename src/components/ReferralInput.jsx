@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ClipboardCopy, Check } from "lucide-react";
 import clsx from "clsx";
-import { FRONTENT_URL } from "@/config/config";
+import { FRONTEND_URL } from "@/config/config";
 
 const ReferralInput = ({
   value,
@@ -16,7 +16,7 @@ const ReferralInput = ({
 
   const handleCopy = async () => {
     try {
-      const referralUrl = `${FRONTENT_URL}/register?referralCode=${value}`;
+      const referralUrl = `${FRONTEND_URL}/register?referralCode=${value}`;
       await navigator.clipboard.writeText(referralUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);

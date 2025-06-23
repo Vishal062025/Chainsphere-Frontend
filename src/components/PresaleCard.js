@@ -171,7 +171,7 @@ function PresaleCard() {
             <div className="flex flex-col items-center">
               <p className="font-geometria font-medium text-base flex gap-6 justify-center mt-[25px]">
                 <a
-                  href="/assets/docs/NebulaStrideWhitepaper.pdf"
+                  href="/assets/docs/request.pdf"
                   target="_blank"
                   className="font-geometria text-white font-medium hover:text-[#943535] hover:underline"
                   rel="noopener noreferrer"
