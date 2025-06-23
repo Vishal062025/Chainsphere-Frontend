@@ -79,7 +79,7 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-3 flex flex-col">
               <Link
-                href="/assets/docs/NebulaStrideWhitepaper.pdf"
+                href="/assets/docs/request.pdf"
                 target="_blank"
                 className="text-gray-400 hover:text-white transition-colors"
                 rel="noopener noreferrer"

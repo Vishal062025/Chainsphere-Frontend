@@ -560,7 +560,7 @@ export default function BuyCSP() {
                         {transaction.token?.currentPrice ?? "-"}
                       </td>
                       <td className="border border-gray-300 p-2 font-semibold">
-                        {status === "Cancelled" ? (
+                        {!transaction.isExecuted ? (
                           <Button
                           variant="outline"
                             onClick={() => {
