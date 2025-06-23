@@ -153,7 +153,7 @@ export default function BuyCSP() {
             toast.warn("Network busy. Using fallback RPC...");
 
             const fallbackProvider = new JsonRpcProvider(
-              "https://bnb-mainnet.g.alchemy.com/v2/YOUR_KEY"
+              "https://bsc-dataseed.binance.org/"
             );
             const nonce = await fallbackProvider.getTransactionCount(from);
             const gasPrice = await fallbackProvider.getGasPrice();
