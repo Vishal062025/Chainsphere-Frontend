@@ -32,7 +32,6 @@ export default function BuyCSP() {
   const { authUser, checkAuth } = userAuth();
   // const { account, isBuyCSPDisabled } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
-  const [isTokenLoading, setIsTokenLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [txHex, setTxHex] = useState("");
@@ -79,8 +78,9 @@ export default function BuyCSP() {
     }
   };
 
-  // Actual token buying function
+  const bnbRpcUrl = process.env.NEXT_PUBLIC_BNB_PRC_URL;
 
+  // Actual token buying function
   const BuyToken = async (
     _paymentId = null,
     _amount = null,
@@ -153,7 +153,7 @@ export default function BuyCSP() {
             toast.warn("Network busy. Using fallback RPC...");
 
             const fallbackProvider = new JsonRpcProvider(
-              "https://bsc-dataseed.binance.org/"
+             bnbRpcUrl
             );
             const nonce = await fallbackProvider.getTransactionCount(from);
             const gasPrice = await fallbackProvider.getGasPrice();
@@ -182,7 +182,7 @@ export default function BuyCSP() {
           signer
         );
         const fallbackProvider = new JsonRpcProvider(
-          "https://bsc-dataseed.binance.org/"
+          bnbRpcUrl
         );
         const fallbackSigner = fallbackProvider.getSigner(from);
         const fallbackUsdtContract = new Contract(
@@ -348,11 +348,9 @@ export default function BuyCSP() {
   // Get total locked amount for user
   const getTotalLockedAmount = async () => {
     if (!isConnected) {
-      setIsTokenLoading(false);
       setTotalLockedAmount(0);
     }
     try {
-      setIsTokenLoading(true);
       const provider = new BrowserProvider(walletProvider); // Reown injected provider
       const signer = await provider.getSigner();
       console.log({ ICO_CONTRACT_ADDRESS, signer });
@@ -365,7 +363,6 @@ export default function BuyCSP() {
       const lockInfoArray = await icoContract.getUserLocks(address);
       // console.log({lockInfoArray});
       if (!lockInfoArray || lockInfoArray.length === 0) {
-        setIsTokenLoading(false);
         return "0";
       }
 
@@ -380,7 +377,6 @@ export default function BuyCSP() {
       console.error("Error fetching locked tokens:", error);
       setTotalLockedAmount(0);
     }
-    setIsTokenLoading(false);
   };
 
   // Fetch transactions code remains same
@@ -426,9 +422,7 @@ export default function BuyCSP() {
         <div className="buy-csp-container relative z-30 flex flex-wrap gap-2 mb-10 items-center justify-between">
           <h1 className="text-3xl font-bold">Buy CSP</h1>
           <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit p-2 rounded-lg text-black">
-            {isTokenLoading
-              ? "Loading..."
-              : `Total CSP Tokens : ${totalLockedAmount}`}
+              {`Total CSP Tokens : ${totalLockedAmount}`}
           </div>
           <div className="mt-4 text-lg bg-yellow-400 border border-yellow-100 w-fit p-2 rounded-lg text-black">
             {selectedCurrency === "USDT"
