@@ -1,5 +1,5 @@
 "use client";
-import { ResetPasswordForm } from "@/components/resetPasswordForm";
+import ResetPasswordForm from "@/components/resetPassword";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
  
