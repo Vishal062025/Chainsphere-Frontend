@@ -527,7 +527,7 @@ export default function BuyCSP() {
 
                   const hash = transaction.transactionHash;
                   const shortHash = `${hash.slice(0, 6)}...${hash.slice(-4)}`;
-                  const scanLink = `https://testnet.bscscan.com/tx/${hash}`;
+                  const scanLink = process.env.NEXT_PUBLIC_DEV_MODE ? `https://testnet.bscscan.com/tx/${hash}` : `https://bscscan.com/tx/${hash}`;
 
                   return (
                     <tr key={transaction.id} className="border border-gray-300">
