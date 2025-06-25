@@ -38,9 +38,12 @@ const handleSubmit = async (e) => {
   console.log({ data });
 
   try {
-    await axios.post(`${BASE_URL}/api/auth/signup`, data);
-    toast("Signup successful, please login with credentials!");
-    router.push("/login");
+   const res= await axios.post(`${BASE_URL}/api/auth/signup`, data);
+   if(res.status==200){
+      toast(res.data.message);
+   }
+   
+    
   } catch (err) {
     console.error("Signup error: ", err);
     toast(err?.response?.data?.error || "Signup failed.");
